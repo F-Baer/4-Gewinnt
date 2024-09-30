@@ -1,5 +1,6 @@
 # Markierung der 4 gewinner steine
-# wenn unentschieden ausgabe
+# wenn unentschieden ausgabe und speil Ende
+
 from PyQt5.QtWidgets import QApplication, QWidget, QTableWidget, QAbstractItemView, QTableWidgetItem, QMessageBox, QGroupBox, QRadioButton, QHBoxLayout
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize
