@@ -1,5 +1,3 @@
-# wenn unentschieden ausgabe und speil Ende
-
 from PyQt5.QtWidgets import QApplication, QWidget, QTableWidget, QAbstractItemView, QTableWidgetItem, QMessageBox, QGroupBox, QRadioButton, QHBoxLayout
 from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtCore import QSize, Qt
@@ -101,6 +99,18 @@ class Spiel(QWidget):
                 return
             
             self.spieler_wechsel()
+        
+        if self.ist_spielfeld_voll() == True:
+            QMessageBox.information(self, "Unentschieden", "Das Spiel endet mit einem Unentschieden")
+            self.reset_spiel()
+
+    def ist_spielfeld_voll(self):
+        for zeile in range(6):
+            for spalte in range(7):
+                if self.spielfeld_status[zeile][spalte] == 0:
+                    return False
+        return True
+
         
     def spieler_wechsel(self):   
         if self.vs_computer.isChecked():
