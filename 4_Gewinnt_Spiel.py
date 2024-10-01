@@ -1,8 +1,3 @@
-# Computer zug geht nicht richtig mit der neuen implementierung
-# Computer mittel und schwer machen probleme 
-
-# evtl lösung durch änderung der markierung der gewinner steine. ich denke durch das prüfen des nächsten zuges
-# des Computers markiert er automatisch. Es muss die markierung wo anderes implementiert werden.
 from PyQt5.QtWidgets import QApplication, QWidget, QTableWidget, QAbstractItemView, QTableWidgetItem, QMessageBox, QGroupBox, QRadioButton, QHBoxLayout
 from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtCore import QSize, Qt
@@ -18,6 +13,7 @@ class Spiel(QWidget):
         # Spiel Variablen
         self.spieler = 0
         self.spielfeld_status = [[0 for _ in range(7)] for _ in range(6)]
+        self.gewinn_position = []
         
         # Für das Spielfeld
         self.spielfeld = QTableWidget(6, 7, self)
@@ -166,7 +162,7 @@ class Spiel(QWidget):
             freie_zeile = self.finde_freie_zeile(spalte)
             if freie_zeile != -1:
                 self.spielfeld_status[freie_zeile][spalte] = 1
-                if self.spiel_logik(1,freie_zeile, spalte):
+                if self.pruefe_spielsteine(1,freie_zeile, spalte):
                     self.spielfeld_status[freie_zeile][spalte] = 0
                     return spalte, freie_zeile
                 self.spielfeld_status[freie_zeile][spalte] = 0
@@ -179,14 +175,14 @@ class Spiel(QWidget):
             freie_zeile = self.finde_freie_zeile(spalte)
             if freie_zeile != -1:
                 self.spielfeld_status[freie_zeile][spalte] = 2
-                if self.spiel_logik(2, freie_zeile, spalte):
+                if self.pruefe_spielsteine(2, freie_zeile, spalte):
                     self.spielfeld_status[freie_zeile][spalte] = 0
                     return spalte, freie_zeile
                 self.spielfeld_status[freie_zeile][spalte]
                 
         return self.computer_zug_mittel()
        
-    def spiel_logik(self, spieler, x, y):
+    def pruefe_spielsteine(self, spieler, x, y):
         return (self.pruefe_horizontal(spieler,x, y) or
                 self.pruefe_vertikal(spieler, x, y) or
                 self.pruefe_diagonal_link(spieler, x, y) or
@@ -194,41 +190,36 @@ class Spiel(QWidget):
     
     def pruefe_horizontal(self, spieler, x, y):
         count = 0
-        gewinn_position = []
 
         for spalte in range(7):
             if self.spielfeld_status[x][spalte] == spieler:
                 count += 1
-                gewinn_position.append((x, spalte))
+                self.gewinn_position.append((x, spalte))
                 if count == 4:
-                    self.markiere_gewinn(gewinn_position)
                     return True
             else:
                 count = 0
-                gewinn_position = []
+                self.gewinn_position = []
         return False
     
     def pruefe_vertikal(self, spieler, x, y):
         count = 0
-        gewinn_position = []
 
         for zeile in range(6):
             if self.spielfeld_status[zeile][y] == spieler:
                 count += 1
-                gewinn_position.append((zeile, y))
+                self.gewinn_position.append((zeile, y))
                 if count == 4:
-                    self.markiere_gewinn(gewinn_position)
                     return True
             else:
                 count = 0
-                gewinn_position = []
+                self.gewinn_position = []
         return False
     
     def pruefe_diagonal_link(self, spieler, x, y):
         # In diesem Abschnitt der Methode wird überprüft, ob es eine Reihe von vier Steinen in einer diagonal
         # nach links verlaufenden Richtung (von unten rechts nach oben links) gibt, die zu einem Sieg führen.
         count = 0
-        gewinn_position = []
         zeile = x
         spalte = y
         
@@ -239,13 +230,12 @@ class Spiel(QWidget):
         while zeile < 6 and spalte < 7:
             if self.spielfeld_status[zeile][spalte] == spieler:
                 count += 1
-                gewinn_position.append((zeile, spalte))
+                self.gewinn_position.append((zeile, spalte))
                 if count == 4:
-                    self.markiere_gewinn(gewinn_position)
                     return True
             else:
                 count = 0
-                gewinn_position = []
+                self.gewinn_position = []
             
             zeile += 1
             spalte += 1
@@ -256,7 +246,6 @@ class Spiel(QWidget):
         # In diesem Abschnitt der Methode wird überprüft, ob es eine Reihe von vier Steinen in einer diagonal
         # nach rechts verlaufenden Richtung (von unten link nach oben rechts) gibt, die zu einem Sieg führen.
         count = 0
-        gewinn_position = []
         zeile = x
         spalte = y
         
@@ -267,13 +256,12 @@ class Spiel(QWidget):
         while zeile > 6 and spalte > 0:
             if self.spielfeld_status[zeile][spalte] == spieler:
                 count += 1
-                gewinn_position.append((zeile, spalte))
+                self.gewinn_position.append((zeile, spalte))
                 if count == 4:
-                    self.markiere_gewinn(gewinn_position)
                     return True
             else:
                 count = 0
-                gewinn_position = []
+                self.gewinn_position = []
             
             zeile += 1
             spalte += 1
@@ -281,7 +269,8 @@ class Spiel(QWidget):
         return False
     
     def pruefe_gewinner(self, spieler, x, y):
-        if self.spiel_logik(spieler, x, y):
+        if self.pruefe_spielsteine(spieler, x, y):
+            self.markiere_gewinn(self.gewinn_position)
             if spieler == 1:
                 QMessageBox.information(self, "Spielende", "Spieler 1 hat gewonnen!")
             elif spieler == 2:
