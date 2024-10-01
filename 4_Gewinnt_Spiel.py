@@ -251,9 +251,9 @@ class Spiel(QWidget):
         
         while zeile > 0 and spalte < 6:
             zeile -= 1
-            spalte -= 1
-
-        while zeile > 6 and spalte > 0:
+            spalte += 1
+       
+        while zeile < 6 and spalte >= 0:
             if self.spielfeld_status[zeile][spalte] == spieler:
                 count += 1
                 self.gewinn_position.append((zeile, spalte))
@@ -264,7 +264,7 @@ class Spiel(QWidget):
                 self.gewinn_position = []
             
             zeile += 1
-            spalte += 1
+            spalte -= 1
             
         return False
     
