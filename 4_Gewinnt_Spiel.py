@@ -1,3 +1,8 @@
+# Computer zug geht nicht richtig mit der neuen implementierung
+# Computer mittel und schwer machen probleme 
+
+# evtl lösung durch änderung der markierung der gewinner steine. ich denke durch das prüfen des nächsten zuges
+# des Computers markiert er automatisch. Es muss die markierung wo anderes implementiert werden.
 from PyQt5.QtWidgets import QApplication, QWidget, QTableWidget, QAbstractItemView, QTableWidgetItem, QMessageBox, QGroupBox, QRadioButton, QHBoxLayout
 from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtCore import QSize, Qt
@@ -156,6 +161,7 @@ class Spiel(QWidget):
         return spalte, freie_zeile
     
     def computer_zug_mittel(self):
+        # prüft ob der Spieler gewinnen kann und blokiert dann den Zug.
         for spalte in range(7):
             freie_zeile = self.finde_freie_zeile(spalte)
             if freie_zeile != -1:
@@ -164,10 +170,11 @@ class Spiel(QWidget):
                     self.spielfeld_status[freie_zeile][spalte] = 0
                     return spalte, freie_zeile
                 self.spielfeld_status[freie_zeile][spalte] = 0
-        
+                        
         return self.computer_zug_leicht()
     
     def computer_zug_schwer(self):
+        # Prüft ob der Computer im nächsten zug gewinnen kann, dann setzt er den Stein dort hin.
         for spalte in range(7):
             freie_zeile = self.finde_freie_zeile(spalte)
             if freie_zeile != -1:
@@ -218,6 +225,8 @@ class Spiel(QWidget):
         return False
     
     def pruefe_diagonal_link(self, spieler, x, y):
+        # In diesem Abschnitt der Methode wird überprüft, ob es eine Reihe von vier Steinen in einer diagonal
+        # nach links verlaufenden Richtung (von unten rechts nach oben links) gibt, die zu einem Sieg führen.
         count = 0
         gewinn_position = []
         zeile = x
@@ -244,6 +253,8 @@ class Spiel(QWidget):
         return False
     
     def pruefe_diagonal_recht(self, spieler, x, y):
+        # In diesem Abschnitt der Methode wird überprüft, ob es eine Reihe von vier Steinen in einer diagonal
+        # nach rechts verlaufenden Richtung (von unten link nach oben rechts) gibt, die zu einem Sieg führen.
         count = 0
         gewinn_position = []
         zeile = x
