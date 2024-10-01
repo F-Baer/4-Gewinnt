@@ -1,9 +1,8 @@
-# Markierung der 4 gewinner steine
 # wenn unentschieden ausgabe und speil Ende
 
 from PyQt5.QtWidgets import QApplication, QWidget, QTableWidget, QAbstractItemView, QTableWidgetItem, QMessageBox, QGroupBox, QRadioButton, QHBoxLayout
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QIcon, QColor
+from PyQt5.QtCore import QSize, Qt
 
 import random
 
@@ -178,30 +177,39 @@ class Spiel(QWidget):
     
     def pruefe_horizontal(self, spieler, x, y):
         count = 0
-        
+        gewinn_position = []
+
         for spalte in range(7):
             if self.spielfeld_status[x][spalte] == spieler:
                 count += 1
+                gewinn_position.append((x, spalte))
                 if count == 4:
+                    self.markiere_gewinn(gewinn_position)
                     return True
             else:
                 count = 0
+                gewinn_position = []
         return False
     
     def pruefe_vertikal(self, spieler, x, y):
         count = 0
-        
+        gewinn_position = []
+
         for zeile in range(6):
             if self.spielfeld_status[zeile][y] == spieler:
                 count += 1
+                gewinn_position.append((zeile, y))
                 if count == 4:
+                    self.markiere_gewinn(gewinn_position)
                     return True
             else:
                 count = 0
+                gewinn_position = []
         return False
     
     def pruefe_diagonal_link(self, spieler, x, y):
         count = 0
+        gewinn_position = []
         zeile = x
         spalte = y
         
@@ -212,10 +220,13 @@ class Spiel(QWidget):
         while zeile < 6 and spalte < 7:
             if self.spielfeld_status[zeile][spalte] == spieler:
                 count += 1
+                gewinn_position.append((zeile, spalte))
                 if count == 4:
+                    self.markiere_gewinn(gewinn_position)
                     return True
             else:
                 count = 0
+                gewinn_position = []
             
             zeile += 1
             spalte += 1
@@ -224,19 +235,24 @@ class Spiel(QWidget):
     
     def pruefe_diagonal_recht(self, spieler, x, y):
         count = 0
+        gewinn_position = []
         zeile = x
         spalte = y
         
         while zeile > 0 and spalte < 6:
             zeile -= 1
             spalte -= 1
+
         while zeile > 6 and spalte > 0:
             if self.spielfeld_status[zeile][spalte] == spieler:
                 count += 1
+                gewinn_position.append((zeile, spalte))
                 if count == 4:
+                    self.markiere_gewinn(gewinn_position)
                     return True
             else:
                 count = 0
+                gewinn_position = []
             
             zeile += 1
             spalte += 1
@@ -257,6 +273,13 @@ class Spiel(QWidget):
             return True
         return False
     
+    def markiere_gewinn(self, gewinn_position):
+        for zeile, spalte in gewinn_position:
+            item = self.spielfeld.item(zeile, spalte)
+            if item:
+                item.setBackground(QColor(0, 0, 0))
+                item.setFlags(item.flags() & ~Qt.ItemIsEditable)
+
     def reset_spiel(self):
         for zeile in range(6):
             for spalte in range(7):
